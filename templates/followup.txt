@@ -1,0 +1,5 @@
+Hey {{Name}},
+
+Just checking in — did you get a chance to see this?
+
+Happy to help.

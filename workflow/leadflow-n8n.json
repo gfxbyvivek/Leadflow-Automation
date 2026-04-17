@@ -1,0 +1,1417 @@
+{
+  "name": "B2C Lead Qualification and Automated Follow-Up System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-form",
+        "options": {}
+      },
+      "id": "8b97ac2e-332f-4727-841e-78bd97532eb3",
+      "name": "Lead Form Submission",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        448
+      ],
+      "webhookId": "11917864-7fae-44cd-a571-1710052da323"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "phone",
+              "value": "={{ $json.body.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "budget",
+              "value": "={{ $json.body.budget }}",
+              "type": "number"
+            },
+            {
+              "id": "id-5",
+              "name": "interest",
+              "value": "={{ $json.body.interest }}",
+              "type": "string"
+            },
+            {
+              "id": "id-6",
+              "name": "lead_id",
+              "value": "={{ $runIndex }}_{{ $now.toMillis() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-7",
+              "name": "created_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-8",
+              "name": "status",
+              "value": "NEW",
+              "type": "string"
+            },
+            {
+              "id": "id-9",
+              "name": "reply_status",
+              "value": "PENDING",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "73d7b7bf-eff3-4ba8-ba16-28497a11bff2",
+      "name": "Capture Lead Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.budget }}",
+                    "rightValue": 5000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "HOT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.budget }}",
+                    "rightValue": 2000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  },
+                  {
+                    "leftValue": "={{ $json.budget }}",
+                    "rightValue": 5000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WARM"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.budget }}",
+                    "rightValue": 2000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "COLD"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "952255c9-c453-47bd-91f7-b9f94ae7c372",
+      "name": "Assign Lead Score",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_score",
+              "value": "HOT",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "lead_tag",
+              "value": "HOT",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "1d89e18d-0e8a-4fb8-a1e3-82e9a134ad67",
+      "name": "Tag as HOT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_score",
+              "value": "WARM",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "lead_tag",
+              "value": "WARM",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "02741028-1ef4-43a5-acd3-73f750ee67d5",
+      "name": "Tag as WARM",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_score",
+              "value": "COLD",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "lead_tag",
+              "value": "COLD",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "0bb7c194-8469-4ab7-9cf1-6d4216807424",
+      "name": "Tag as COLD",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__leads_table__>"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "a0c5bddf-25a8-436f-9b9f-3c08bbdae717",
+      "name": "Store Lead Record",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1152,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__activity_log__>"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "79bdfcc3-feb9-4979-93dc-845624c8f624",
+      "name": "Log Lead Created",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__slack_channel_id__>"
+        },
+        "text": "=🔥 *HOT Lead Alert!*\n\n*Name:* {{ $json.name }}\n*Email:* {{ $json.email }}\n*Phone:* {{ $json.phone }}\n*Budget:* ${{ $json.budget }}\n*Interest:* {{ $json.interest }}\n\nLead ID: {{ $json.lead_id }}\nCreated: {{ $json.created_at }}",
+        "otherOptions": {}
+      },
+      "id": "bf71e7c6-d49c-42f5-b153-d37a6a04880a",
+      "name": "Notify Team - HOT Lead",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1152,
+        688
+      ],
+      "webhookId": "d1a9cbc0-9f0f-479e-b732-19125c361e61"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Quick follow-up",
+        "message": "=Hey {{ $json.name }},\n\nSaw your interest in {{ $json.interest }} — would love to help you with this.\n\nLet me know a good time to connect.\n\nBest regards",
+        "options": {}
+      },
+      "id": "abed7ce3-bc0e-4946-a3ca-cbe1ac056d4b",
+      "name": "Send Initial Outreach",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1824,
+        448
+      ],
+      "webhookId": "2cdcda6a-8775-4c82-a7e0-d22a436b9927"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__activity_log__>"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "52b64901-4467-4488-9ef9-b3e23254fcf8",
+      "name": "Log Email Sent",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2272,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "hours"
+      },
+      "id": "577e1be5-36aa-4946-b83a-c759ef10b431",
+      "name": "Wait 24 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2496,
+        448
+      ],
+      "webhookId": "f255c99a-53bc-4d49-90a3-57e8e6537115"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "filters": {
+          "sender": "={{ $json.email }}"
+        }
+      },
+      "id": "5edb69e6-5e49-4ae3-b8f3-ec2f3436b3d2",
+      "name": "Check Lead Response",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2720,
+        448
+      ],
+      "webhookId": "6e32a37a-ed9d-4e74-b7fd-3e1464f26342"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $('Check Lead Response').item.json.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5682ce11-dd9b-4a2d-a3eb-c0177112b0a0",
+      "name": "Lead Replied?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2944,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__leads_table__>"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $('Wait 24 Hours').item.json.lead_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "ff50dd63-ed6f-4f15-88fc-23d5d757b1de",
+      "name": "Update to ACTIVE",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3392,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__activity_log__>"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "c07ab864-f50f-466e-bb48-3d71339d9390",
+      "name": "Log Lead Replied",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3840,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Wait 24 Hours').item.json.email }}",
+        "subject": "Following up",
+        "message": "=Hey {{ $('Wait 24 Hours').item.json.name }},\n\nJust checking in — did you get a chance to see this?\n\nHappy to help whenever you're ready.\n\nBest regards",
+        "options": {}
+      },
+      "id": "4b57d130-e490-4b1c-8f20-bcd63b31422f",
+      "name": "Trigger Follow-up Sequence",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3168,
+        544
+      ],
+      "webhookId": "634ce622-dd74-44de-ad89-2a4d3c366b3f"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__activity_log__>"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "67201527-d267-481b-b32d-1e1bbd6cbca0",
+      "name": "Log Follow-up Sent",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3616,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 48,
+        "unit": "hours"
+      },
+      "id": "500e1838-1b78-4cf2-b394-5cf215c4c112",
+      "name": "Wait 48 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3840,
+        544
+      ],
+      "webhookId": "dbc35482-ba5a-40bf-aad3-fd2e2c97420e"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "filters": {
+          "sender": "={{ $('Wait 48 Hours').item.json.email }}"
+        }
+      },
+      "id": "f8207a59-1d4f-4fa1-8b3f-f35158b5a4bd",
+      "name": "Final Response Check",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        4064,
+        544
+      ],
+      "webhookId": "c217bfe7-8ef5-43a1-a834-b4425dba80be"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $('Final Response Check').item.json.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1ee7d6e6-aed6-4f92-86a9-0795a7ca5cd8",
+      "name": "Final Reply Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4288,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__leads_table__>"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $('Wait 48 Hours').item.json.lead_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "7a7b4f6b-fd4f-4f84-95bc-997318d8c6ab",
+      "name": "Update to ACTIVE (Final)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4736,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__activity_log__>"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "cff3405d-419c-4dc6-b1c3-10577ff276bb",
+      "name": "Log Final Reply",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        5184,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__leads_table__>"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $('Wait 48 Hours').item.json.lead_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "c4504525-9ebb-446c-9cea-34498ce5d9c9",
+      "name": "Mark as COLD",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4736,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<__PLACEHOLDER_VALUE__activity_log__>"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "6e2c613d-c80d-4e51-a635-6d49e0600731",
+      "name": "Log Unresponsive",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        5184,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_id",
+              "value": "={{ $json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "action",
+              "value": "=Lead created with {{ $json.lead_tag }} score",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3861bcb9-457e-4a86-8ac4-dfe7135deb2c",
+      "name": "Prepare Log Entry 1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_id",
+              "value": "={{ $json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "action",
+              "value": "Initial email sent",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "88200eb5-2841-4e27-850b-e797d21c6749",
+      "name": "Prepare Log Entry 2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2048,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "status",
+              "value": "ACTIVE",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "reply_status",
+              "value": "REPLIED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bd497904-c9bd-42cd-be51-5c5a781bc341",
+      "name": "Prepare Update 1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3168,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_id",
+              "value": "={{ $('Wait 24 Hours').item.json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email",
+              "value": "={{ $('Wait 24 Hours').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "action",
+              "value": "Lead replied - status updated to ACTIVE",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9b7192b2-54f7-48a5-a3ac-0b10de84dbab",
+      "name": "Prepare Log Entry 3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3616,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_id",
+              "value": "={{ $('Wait 24 Hours').item.json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email",
+              "value": "={{ $('Wait 24 Hours').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "action",
+              "value": "Follow-up email sent",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6fb7edec-ca9a-421c-8cf9-32f43fb0df08",
+      "name": "Prepare Log Entry 4",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3392,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "status",
+              "value": "ACTIVE",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "reply_status",
+              "value": "REPLIED",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bfd7b65e-433a-4fc0-8bb0-79c22729730c",
+      "name": "Prepare Update 2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4512,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_id",
+              "value": "={{ $('Wait 48 Hours').item.json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email",
+              "value": "={{ $('Wait 48 Hours').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "action",
+              "value": "Lead replied after follow-up - status updated to ACTIVE",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2554e290-9b8d-4290-9c32-0508b76e2b8f",
+      "name": "Prepare Log Entry 5",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4960,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "status",
+              "value": "COLD",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "reply_status",
+              "value": "NO_RESPONSE",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "72165fb8-8e83-4330-867a-668a328bf935",
+      "name": "Prepare Update 3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4512,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "lead_id",
+              "value": "={{ $('Wait 48 Hours').item.json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email",
+              "value": "={{ $('Wait 48 Hours').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "action",
+              "value": "Lead unresponsive - marked as COLD",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b996eee1-4f6b-42cb-93c4-6f933f0bb2d0",
+      "name": "Prepare Log Entry 6",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4960,
+        640
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lead Form Submission": {
+      "main": [
+        [
+          {
+            "node": "Capture Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capture Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Assign Lead Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Lead Score": {
+      "main": [
+        [
+          {
+            "node": "Tag as HOT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tag as WARM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tag as COLD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag as HOT": {
+      "main": [
+        [
+          {
+            "node": "Store Lead Record",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Team - HOT Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag as WARM": {
+      "main": [
+        [
+          {
+            "node": "Store Lead Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag as COLD": {
+      "main": [
+        [
+          {
+            "node": "Store Lead Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Lead Record": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log Entry 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Lead Created": {
+      "main": [
+        [
+          {
+            "node": "Send Initial Outreach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Initial Outreach": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log Entry 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Email Sent": {
+      "main": [
+        [
+          {
+            "node": "Wait 24 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 24 Hours": {
+      "main": [
+        [
+          {
+            "node": "Check Lead Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Lead Response": {
+      "main": [
+        [
+          {
+            "node": "Lead Replied?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Replied?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Trigger Follow-up Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update to ACTIVE": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log Entry 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Follow-up Sequence": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log Entry 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Follow-up Sent": {
+      "main": [
+        [
+          {
+            "node": "Wait 48 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 48 Hours": {
+      "main": [
+        [
+          {
+            "node": "Final Response Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Response Check": {
+      "main": [
+        [
+          {
+            "node": "Final Reply Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Reply Check": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Update 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update to ACTIVE (Final)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log Entry 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as COLD": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log Entry 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Log Entry 1": {
+      "main": [
+        [
+          {
+            "node": "Log Lead Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Log Entry 2": {
+      "main": [
+        [
+          {
+            "node": "Log Email Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update 1": {
+      "main": [
+        [
+          {
+            "node": "Update to ACTIVE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Log Entry 3": {
+      "main": [
+        [
+          {
+            "node": "Log Lead Replied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Log Entry 4": {
+      "main": [
+        [
+          {
+            "node": "Log Follow-up Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update 2": {
+      "main": [
+        [
+          {
+            "node": "Update to ACTIVE (Final)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Log Entry 5": {
+      "main": [
+        [
+          {
+            "node": "Log Final Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update 3": {
+      "main": [
+        [
+          {
+            "node": "Mark as COLD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Log Entry 6": {
+      "main": [
+        [
+          {
+            "node": "Log Unresponsive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "12202b82-93f3-44b6-a58c-10cd2c6f52fc",
+  "meta": {
+    "instanceId": "d9d6c1bc477500fc9079cc5dce6c8fc248dbd4323948be9d0b78ab802b0549a0"
+  },
+  "id": "4D02gLQ7bgiQtiCc",
+  "tags": []
+}
